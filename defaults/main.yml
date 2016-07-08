@@ -1,0 +1,7 @@
+---
+fail2ban_version: 0.9.4
+fail2ban_clear_jails: no
+fail2ban_jail_dir: ''
+fail2ban_filter_dir: ''
+fail2ban_action_dir: ''
+fail2ban_jails: []

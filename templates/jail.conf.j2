@@ -1,0 +1,57 @@
+[{{ item.name }}]
+
+{% if item.enabled %}
+enabled  = true
+{% else %}
+enabled  = false
+{% endif %}
+
+{%- if item.port is defined %}
+port     = {{ item.port }}
+{% endif %}
+
+{%- if item.protocol is defined %}
+protocol = {{ item.protocol }}
+{% endif %}
+
+{%- if item.filter is defined %}
+filter   = {{ item.filter }}
+{% endif %}
+
+{%- if item.bantime is defined %}
+bantime  = {{ item.bantime }}
+{% endif %}
+
+{%- if item.findtime is defined %}
+findtime = {{ item.findtime }}
+{% endif %}
+
+{%- if item.maxretry is defined %}
+maxretry = {{ item.maxretry }}
+{% endif %}
+
+{%- if item.action is defined %}
+{% if item.action is string %}
+action   = {{ item.action }}
+{% else %}
+action   = {{ item.action[0] }}
+{% for action in item.action[1:] %}
+           {{ action }}
+{% endfor %}
+{% endif %}
+{% endif %}
+
+{%- if item.logpath is defined %}
+{% if item.logpath is string %}
+logpath  = {{ item.logpath }}
+{% else %}
+logpath  = {{ item.logpath[0] }}
+{% for logpath in item.logpath[1:] %}
+           {{ logpath }}
+{% endfor %}
+{% endif %}
+{% endif %}
+
+{%- if item.banaction is defined %}
+banaction = {{ item.banaction }}
+{% endif %}

@@ -1,0 +1,13 @@
+---
+- hosts: all
+  sudo: yes
+  roles:
+    - role: ansible-fail2ban
+      fail2ban_clear_jails: yes
+      fail2ban_filter_dir: filters/
+      fail2ban_jails:
+        - name: example
+          enabled: yes
+          maxretry: 3
+          logpath: /var/log/example.log
+          banaction: iptables-allports

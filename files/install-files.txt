@@ -1,0 +1,6 @@
+/usr/local/lib/python2.7/dist-packages/fail2ban
+/usr/local/bin/fail2ban-server
+/usr/local/bin/fail2ban-regex
+/usr/local/bin/fail2ban-testcases
+/usr/local/bin/fail2ban-client
+/etc/init.d/fail2ban

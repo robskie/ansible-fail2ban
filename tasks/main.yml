@@ -1,0 +1,99 @@
+---
+- name: Include installation tasks
+  include: install.yml
+  tags: fail2ban, install, fail2ban:install
+
+- name: Get files in remote jail directory
+  command: ls -1 /etc/fail2ban/jail.d
+  register: jaildir
+  changed_when: false
+  tags: fail2ban, configure, fail2ban:configure
+
+- name: Get files in local jail directory
+  command: ls -1 {{ fail2ban_jail_dir }}
+  sudo: false
+  delegate_to: localhost
+  register: jailfiles
+  changed_when: false
+  tags: fail2ban, configure, fail2ban:configure
+
+- name: Delete old jail config files
+  file: path={{ item }} state=absent
+  with_items: >-
+    {%- set comma = joiner(",") -%}
+    [{% for jailfile in jaildir.stdout_lines %}
+      {%- set jailname = jailfile[:-5] %}
+      {%- if jailfile not in jailfiles.stdout_lines %}
+      {%- if jailname not in fail2ban_jails|map(attribute='name') %}
+        {{ comma() }}"{{ '/etc/fail2ban/jail.d/'+jailfile }}"
+      {%- endif %}
+      {%- endif %}
+    {%- endfor %}]
+  when: fail2ban_clear_jails == true
+  notify: Restart Fail2Ban
+  tags: fail2ban, configure, fail2ban:configure
+
+- name: Copy config file
+  copy:
+    src: "{{ fail2ban_config_file }}"
+    dest: /etc/fail2ban/fail2ban.local
+    owner: root
+    group: root
+    mode: 0644
+  when: fail2ban_config_file is defined
+  notify: Restart Fail2Ban
+  tags: fail2ban, configure, fail2ban:configure
+
+- name: Copy jail config file
+  copy:
+    src: "{{ fail2ban_jail_file }}"
+    dest: /etc/fail2ban/jail.local
+    owner: root
+    group: root
+    mode: 0644
+  when: fail2ban_jail_file is defined
+  notify: Restart Fail2Ban
+  tags: fail2ban, configure, fail2ban:configure
+
+- name: Copy filters to filter.d directory
+  copy:
+    src: "{{ fail2ban_filter_dir }}{% if fail2ban_filter_dir[-1] != '/' %}/{% endif %}"
+    dest: /etc/fail2ban/filter.d/
+    owner: root
+    group: root
+    mode: 0644
+  when: fail2ban_filter_dir != ""
+  tags: fail2ban, configure, fail2ban:configure
+
+- name: Copy actions to action.d directory
+  copy:
+    src: "{{ fail2ban_action_dir }}{% if fail2ban_action_dir[-1] != '/' %}/{% endif %}"
+    dest: /etc/fail2ban/action.d/
+    owner: root
+    group: root
+    mode: 0644
+  when: fail2ban_action_dir != ""
+  tags: fail2ban, configure, fail2ban:configure
+
+- name: Copy jails to jail.d directory
+  copy:
+    src: "{{ fail2ban_jail_dir }}{% if fail2ban_jail_dir[-1] != '/' %}/{% endif %}"
+    dest: /etc/fail2ban/jail.d/
+    owner: root
+    group: root
+    mode: 0644
+  when: fail2ban_jail_dir != ""
+  notify: Restart Fail2Ban
+  tags: fail2ban, configure, fail2ban:configure
+
+- name: Create jail fragments
+  template:
+    src: jail.conf.j2
+    dest: "/etc/fail2ban/jail.d/{{ item.name }}.conf"
+  with_items: "{{ fail2ban_jails }}"
+  notify: Restart Fail2Ban
+  tags: fail2ban, configure, fail2ban:configure
+
+- name: Start and enable Fail2Ban
+  service: name=fail2ban state=started enabled=yes
+  tags: fail2ban, configure, fail2ban:configure

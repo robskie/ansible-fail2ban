@@ -1,0 +1,26 @@
+---
+- name: Gather additional host info
+  shell: >-
+    iptables --version;
+    fail2ban-client --version || echo "Fail2Ban Not Installed"
+  register: info
+  changed_when: false
+
+- name: Set installation variables
+  set_fact:
+    ipt_version: "{{ info.stdout_lines[0][10:] }}"
+    f2b_version: "{{ info.stdout_lines[1][10:] }}"
+
+- name: Remove previous versions (Apt)
+  apt: name=fail2ban state=absent
+  register: aptremove
+  when: "f2b_version != '{{ fail2ban_version }}'"
+
+- name: Remove previous versions (Manual)
+  file: path={{ item }} state=absent
+  with_items: "{{ lookup('file', 'install-files.txt').split() }}"
+  when: "not aptremove|changed and f2b_version != '{{ fail2ban_version }}'"
+
+- name: Install Fail2Ban
+  script: "install.sh {{ fail2ban_version }} {{ ipt_version }}"
+  when: "f2b_version != '{{ fail2ban_version }}'"

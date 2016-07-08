@@ -1,0 +1,22 @@
+---
+galaxy_info:
+  author: robskie
+  description: Installs and configures Fail2Ban from source
+  license: MIT license
+  min_ansible_version: 1.4
+  platforms:
+  - name: Debian
+    versions:
+      - wheezy
+      - jessie
+  - name: Ubuntu
+    versions:
+      - precise
+      - trusty
+      - xenial
+  galaxy_tags:
+    - fail2ban
+    - security
+    - monitoring
+
+dependencies: []
