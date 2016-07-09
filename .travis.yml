@@ -1,0 +1,57 @@
+---
+sudo: required
+language: python
+python: "2.7"
+
+env:
+  global:
+    - TESTIP=1.2.3.4
+    - LOGFILE=/var/log/example.log
+
+# Install ansible
+addons:
+  apt:
+    packages:
+    - python-pip
+
+install:
+  # Install ansible
+  - pip install ansible
+
+  # Check ansible version
+  - ansible --version
+
+  # Create ansible.cfg with correct roles_path
+  - printf '[defaults]\nroles_path=../' >ansible.cfg
+
+before_script:
+  # Create test log file
+  - sudo touch $LOGFILE
+
+script:
+  # Basic role syntax check
+  - ansible-playbook tests/test.yml -i tests/inventory --syntax-check
+
+  # Run the role/playbook with ansible-playbook.
+  - ansible-playbook -i tests/inventory tests/test.yml --connection=local
+
+  # Run the role/playbook again, checking to make sure it's idempotent.
+  - >
+    ansible-playbook -i tests/inventory tests/test.yml --connection=local
+    | grep -q 'changed=0.*failed=0'
+    && (echo 'Idempotence test: pass' && exit 0)
+    || (echo 'Idempotence test: fail' && exit 1)
+
+  # Create test logs
+  - >
+    for i in {1..3};
+    do
+      echo $(date '+%b %d %H:%M:%S') srv example[999]: Ban this host:$TESTIP | sudo tee -a $LOGFILE;
+      sleep 1;
+    done
+
+  # Check if test ip is banned
+  - sudo iptables -L | grep "REJECT.*$TESTIP"
+
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/
