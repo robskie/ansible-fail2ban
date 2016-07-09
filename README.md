@@ -1,7 +1,12 @@
 # Ansible Role: Fail2Ban
+[![Build Status](https://travis-ci.org/robskie/ansible-fail2ban.svg?branch=master)][1]
+[![Ansible Galaxy](https://img.shields.io/badge/ansible--galaxy-fail2ban-blue.svg)][2]
 
 This role installs and configures the latest Fail2Ban stable version from
 source. This has been tested on Debian and Ubuntu Linux systems.
+
+[1]: https://travis-ci.org/robskie/ansible-fail2ban
+[2]: https://galaxy.ansible.com/robskie/fail2ban/
 
 ## Requirements
 
