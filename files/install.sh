@@ -1,12 +1,20 @@
 #!/bin/bash
 # This script will install Fail2Ban.
 
-# Download and extract latest stable version
+# Download
 fail2ban_version=$1
-curl -O -L --silent https://github.com/fail2ban/fail2ban/archive/$fail2ban_version.tar.gz
-tar xf $fail2ban_version.tar.gz
+download_url=https://github.com/fail2ban/fail2ban/archive/$fail2ban_version.tar.gz
+curl -O -L --silent --fail $download_url
+if [ $? -ne 0 ]
+then
+  echo "Can't download Fail2Ban version $fail2ban_version"
+  echo "Check if the following download URL is correct:"
+  echo "$download_url"
+  exit 1
+fi
 
-# Install
+# Extract and install
+tar xf $fail2ban_version.tar.gz
 cd fail2ban-$fail2ban_version
 sudo python setup.py --quiet install --prefix=/usr/local
 
