@@ -51,7 +51,7 @@ script:
     done
 
   # Check if test ip is banned
-  - sudo iptables -L | grep "REJECT.*$TESTIP"
+  - sudo iptables -L -n | grep "REJECT.*$TESTIP"
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
