@@ -90,6 +90,9 @@
   template:
     src: jail.conf.j2
     dest: "/etc/fail2ban/jail.d/{{ item.name }}.conf"
+    owner: root
+    group: root
+    mode: 0644
   with_items: "{{ fail2ban_jails }}"
   notify: Restart Fail2Ban
   tags: fail2ban, configure, fail2ban:configure
